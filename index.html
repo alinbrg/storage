@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<title>Storage</title>
+</head>
+<body>
+<div class="bg"></div>
+<div class="wrapper">
+	<h2>LOCAL FOOD</h2>
+	<p></p>
+	<ul class="plates">
+		<li>Loading ...</li>
+	</ul>
+	<form class="add-items">
+		<input type="text" name="item" placeholder="Name" required>
+		<input type="submit" value="+ Add Item">
+	</form>
+	<!-- <div class="btns">
+		<button>delete all</button>
+		<button>check all</button>
+		<button>uncheck all</button>
+	</div> -->
+</div>
+
+
+
+<script type="text/javascript">
+	const addItems = document.querySelector('.add-items');
+	const itemsList = document.querySelector('.plates');
+	const items = JSON.parse(localStorage.getItem('items')) || [];
+
+	function addItem(e){
+		e.preventDefault();
+		const text = (this.querySelector("[name = item]")).value;
+		const item = {
+			text,
+			done: false
+		};
+		items.push(item);
+		populateList(items, itemsList);
+		localStorage.setItem('items', JSON.stringify(items));
+		this.reset();
+		
+	}
+
+	function populateList(plates = [], platesList){
+		platesList.innerHTML = plates.map((plate, i) => {
+			return `
+				<li>
+					<input type="checkbox" data-index = ${i} id="item${i}" ${plate.done ? 'checked' : ''}/>
+					<label for="item${i}">${plate.text}</label>
+				</li>
+			`;
+		}).join('');
+	}
+
+	function toggleDone(e){
+		if(!e.target.matches('input')) return;
+		const el = e.target;
+		const index = el.dataset.index;
+		items[index].done = !items[index].done;
+		
+		localStorage.setItem('items', JSON.stringify(items));
+		populateList(items, itemsList);
+	}
+
+	addItems.addEventListener("submit", addItem);
+	itemsList.addEventListener('click', toggleDone);
+
+	populateList(items, itemsList);
+</script>
+</body>
+</html>
